@@ -37,14 +37,20 @@ __DB = None
 def db_connect( *args, **args_dict ):
     __db_connect( *args, **args_dict )
 
+def db_query():
+    return _db_query()
+
+def db_version():
+    return _db_version()
 
 def __db_connect( *args, **args_dict ):
     global __DB
     __DB = MySQLdb.connect( *args, **args_dict )
+    __DB.set_character_set( 'utf8' )
 
+def __db_query():
+    pass
+ 
 def __db_version():
     pass
-
-
-
 
