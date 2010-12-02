@@ -25,3 +25,26 @@ API for Mysql database basic:
   db_unlock_tables     Unlock all locked tables.
   db_version           Returns the version of the database server currently in use.
 """
+#
+#import ConfigParser
+
+import MySQLdb
+
+# Globle the db link handle and init
+__DB = None
+
+
+def db_connect( *args, **args_dict ):
+    __db_connect( *args, **args_dict )
+
+
+def __db_connect( *args, **args_dict ):
+    global __DB
+    __DB = MySQLdb.connect( *args, **args_dict )
+
+def __db_version():
+    pass
+
+
+
+
