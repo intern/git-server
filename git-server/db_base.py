@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 API for Mysql database basic:
 
@@ -31,22 +32,29 @@ import MySQLdb
 
 import re
 
-# Globle the db link handle and init
+# Globle the db link handle and table prefix
 __DB = None
 
-# Indicates the place holders that should be replaced in __db_query_callback() 
+__DB_PREFIX = None
+
+# Indicates the place holders that should be replaced in __db_query_callback()
 DB_QUERY_REGEXP = '(%d|%s|%%|%f|%b|%n)'
 
-def get_db_config():
+def get_db_config_file():
     config = ConfigParser.ConfigParser()
     # TODO fix the abs path
-    config.read('git-server/config.ini')
+    config.read('config.ini')
+    return config
+
+def get_db_config():
+    config = get_db_config_file()
     return __get_db_config(config)
 
 def db_connect( ):
     __db_connect( **get_db_config() )
 
 def db_query(query, *args):
+    query = db_prefix(query)
     query = __db_query_callback(query, *args)
     return __db_query(query)
 
@@ -61,6 +69,9 @@ def db_fetch_hash(cursor):
     if record is None:
         cursor.close()
     return record
+
+def db_prefix_tables():
+    return __DB_PREFIX
 
 #Lock the named table.
 def db_lock_table(table):
@@ -96,6 +107,10 @@ def db_decode_blob(data):
 # Check if a table exists.
 def db_table_exists(table):
     return db_fetch_hash(db_query("SHOW TABLES LIKE '{" + db_escape_table(table) + "}'"))
+
+# tables implement prefix with config.ini
+def db_prefix(query):
+    return query.replace('{', db_prefix_tables()).replace('}', '')
 
 def __db_connect( *args, **args_dict ):
     global __DB
@@ -138,7 +153,7 @@ def __db_query_args_to_tuple(*args):
     if len(args):
         if isinstance(args[0], tuple) or isinstance(args[0], list):
             args = tuple(args[0])
-    return args 
+    return args
 
 def __db_query_sql_format(slices, holders, args):
     for i, holder in enumerate(holders):
@@ -154,6 +169,7 @@ def __db_version():
     return __DB.get_server_info().split('-')[0]
 
 def __get_db_config(config):
+    global __DB_PREFIX
     db_conf = dict()
     db_conf['host']    = config.get('MYSQL', 'server'  )
     db_conf['user']    = config.get('MYSQL', 'username')
@@ -161,13 +177,16 @@ def __get_db_config(config):
     db_conf['port']    = config.getint('MYSQL', 'port' )
     db_conf['db']      = config.get('MYSQL', 'database')
     db_conf['charset'] = config.get('MYSQL', 'encoding')
+
+    # Setting the table prefix
+    __DB_PREFIX = config.get('MYSQL', 'prefix')
     return db_conf
 
 if __name__ == '__main__':
    db_connect()
-   db_query("insert into sshes(user_id, public_key, alias) values(%d, '%s', '%s')",[100,'kkkkkkkkkkkkkkk','alias heressssss'])
+   db_query("insert into {role}(name) values('%s')",['alias heressss'])
    print db_last_insert_id()
-   link = db_query("select id from sshes where id>%d and user_id>%d", 0, 0, 'test key' )
+   link = db_query("select * from {role} where rid > %d ", 10, 0, 'test key' )
    print 'db_result:', db_result(link)
    print "db_affected_rows:", db_affected_rows(link)
    while(True):
