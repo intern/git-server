@@ -40,6 +40,9 @@ __DB_PREFIX = None
 # Indicates the place holders that should be replaced in __db_query_callback()
 DB_QUERY_REGEXP = '(%d|%s|%%|%f|%b|%n)'
 
+# Safe characters for column, table or constraint name
+DB_SAFE_CHARACTERS_REGEXP = '[^A-Za-z0-9_]+'
+
 def get_db_config_file():
     config = ConfigParser.ConfigParser()
     # TODO fix the abs path
@@ -86,6 +89,10 @@ def db_result(cursor):
 
 def db_last_insert_id():
     return db_result(db_query('SELECT LAST_INSERT_ID()'))
+
+def db_escape_table(name):
+    pattern = re.compile(DB_SAFE_CHARACTERS_REGEXP)
+    return re.sub(pattern, '', name)
 
 def db_is_active():
     return bool(_DB.open)
