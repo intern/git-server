@@ -17,6 +17,7 @@ COMMANDS_WRITE = [
     'git receive-pack',
     ]
 
+# the Mysql Tables structure, its require
 def initialization_db_sql():
     return u"""
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
@@ -59,6 +60,14 @@ CREATE TABLE IF NOT EXISTS `{users}` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
     """
+
+# To read the initialization admin's ssh public key. configure the git server must.
+#     usage:
+#         sudo -H -u git gitosis-init < /tmp/id_rsa.pub
+#
+def read_init_public_key():
+    fp = sys.stdin
+    return str(fp.readline()).strip()
 
 db_connect()
 
