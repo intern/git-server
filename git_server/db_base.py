@@ -136,7 +136,7 @@ def __db_query(query):
 
 def __db_result(cursor):
     fetch = db_fetch_hash(cursor)
-    if len(fetch):
+    if fetch and len(fetch):
         return fetch[fetch.keys()[0]]
     return None
 
