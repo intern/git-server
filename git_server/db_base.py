@@ -46,7 +46,7 @@ DB_SAFE_CHARACTERS_REGEXP = '[^A-Za-z0-9_]+'
 def get_db_config_file():
     config = ConfigParser.ConfigParser()
     # TODO fix the abs path
-    config.read('config.ini')
+    config.read('/etc/git.conf')
     return config
 
 def get_db_config():
