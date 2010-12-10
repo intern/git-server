@@ -1,1 +1,7 @@
-The git-server is a database management with the user information mysql server.
+The git-server can manage the git projects own use mysql database, It‘s easy.
+  - use the mysql db can mange user SSH key.
+  - Embedded into the web application.
+
+==SETUP==
+  Coming soon...
+
