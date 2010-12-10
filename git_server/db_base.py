@@ -87,6 +87,10 @@ def db_unlock_tables():
 def db_result(cursor):
     return __db_result(cursor)
 
+# if you insert, delete or update, please execute the method to commit transaction. 
+def db_commit():
+    __DB.commit()
+
 def db_last_insert_id():
     return db_result(db_query('SELECT LAST_INSERT_ID()'))
 
@@ -189,6 +193,7 @@ def __get_db_config(config):
     __DB_PREFIX = config.get('MYSQL', 'prefix')
     return db_conf
 
+# DEBUG Paragraph
 if __name__ == '__main__':
    db_connect()
    db_query("insert into {role}(name) values('%s')",['alias heressss'])

@@ -73,18 +73,21 @@ def read_init_public_key():
     fp = sys.stdin
     return str(fp.readline()).strip()
 
-db_connect()
-
 def admin_config():
     conf = get_db_config_file()
     return conf.get('ADMIN', 'email')
 
-for sql in initialization_db_sql():
-    db_query(sql)
+# bootstrap to init tables struct and admin data.
+def bootstrap():
+    db_connect()
+    for sql in initialization_db_sql():
+        db_query(sql)
 
+    db_query("INSERT INTO `{users}`(`email`, `created_at`, `updated_at`) VALUES('%s', NOW(), NOW())", admin_config())
 
-db_query("INSERT INTO `{users}`(`email`, `created_at`, `updated_at`) VALUES('%s', NOW(), NOW())", admin_config())
+    db_query("INSERT INTO `{sshes}`(`uid`, `title`, `ssh_key`, `created_at`, `updated_at`) VALUES(%d, '%s', '%s', NOW(), NOW())", db_last_insert_id(), 'lan_chi@foxmail.com', read_init_public_key())
 
-db_query("INSERT INTO `{sshesss}`(`uid`, `title`, `ssh_key`, `created_at`, `updated_at`) VALUES(%d, '%s', '%s', NOW(), NOW())", db_last_insert_id(), 'lan_chi@foxmail.com', read_init_public_key())
+    # commit transaction
+    db_commit()
 
-sys.exit()
+    #sys.exit()

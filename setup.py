@@ -35,10 +35,10 @@ This is long description with the git-server.""",
     author_email = "lan_chi@foxmail.com",
     entry_points = {
         'console_scripts': [
-            'git-server = git_server.git_server',
-            'git-init   = git_server.git_init',
-            'run-auth-keys-hook = git_server.authorized_keys_hook'
-            ],
+            'git-server = git_server.git_server:bootstrap',
+            'git-init   = git_server.git_init:bootstrap',
+            'run-auth-keys-hook = git_server.authorized_keys_hook:bootstrap'
+            ]
         }
     #scripts = ['git-server/git-init.py', 'git-server/git-server.py', 'git-server/authorized_keys_hook.py']
 )

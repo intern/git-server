@@ -1,1 +1,2 @@
-print 'git-server here@'
+def bootstrap():
+    print 'git-server here@'
