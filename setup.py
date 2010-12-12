@@ -6,9 +6,9 @@ import os, sys
 
 from setuptools import setup,find_packages
 
-# copy the git server config. et: db conf.
+# mkdir git logging dir and copy the git server config. et: db conf.
 def install_config():
-    cp = r"cp -f git_server/git-server.conf /etc/git.conf"
+    cp = r"mkdir -p /var/log/git; cp -f git_server/git-server.conf /etc/git.conf"
     if os.system(cp) > 0:
         print """
 Please use:

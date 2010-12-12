@@ -31,10 +31,10 @@ def write_authorized_sshes(records):
         os.mkdir(dirname)
 
     with open(auth_key_path, 'w') as f:
-        f.write(records)
+        f.write("%s" % records)
 
 def bootstrap():
     records = get_ssh_records()
     write_authorized_sshes(records)
 
-    print SSH_KEY_TEMPLATE
+    #print SSH_KEY_TEMPLATE
