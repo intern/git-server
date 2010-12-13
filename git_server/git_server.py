@@ -13,6 +13,8 @@ ALLOW_RE = re.compile("^'/*(?P<path>[a-zA-Z0-9][a-zA-Z0-9@._-]*(/[a-zA-Z0-9][a-z
 
 ERROR_TIP = "Server is busy."
 
+CURRENT_USER = {}
+
 COMMANDS_READONLY = [
     'git-upload-pack',
     'git upload-pack',
@@ -23,13 +25,37 @@ COMMANDS_WRITE = [
     'git receive-pack',
     ]
 
-def parser_command_ssh_id():
+# return command ssh_id for sshes tbale.
+def parser_ssh_id_from_command():
     c_handle = optparse.OptionParser()
     (options, args) = c_handle.parse_args()
     if not len(args):
         logging.error("git-server params error, Is't ssh_id number, it is None")
         sys.exit(1)
     return int(args.pop(0))
+
+
+# return user info from {users} table.
+#     used parser_ssh_id_from_command()
+def current_user():
+    global CURRENT_USER
+    
+    if CURRNET_USER:
+        return CURRENT_USER
+
+    ssh_id  = parser_ssh_id_from_command()
+
+    results = db_query("SELECT user.* FROM master_users AS user LEFT JOIN master_sshes AS ssh ON ssh.uid = user.id WHERE ssh.id = %d limit 1", ssh_id)
+
+    user = db_fetch_hash(results)
+
+    if user is None:
+        logging.error("Can't find current user with ssh_id '%s', exit!", ssh_id)
+        sys.exit(1)
+
+    CURRENT_USER = user
+
+    return CURRENT_USER
 
 def handle_ssh_args():
     cmd = os.environ.get('SSH_ORIGINAL_COMMAND', None)
@@ -57,6 +83,8 @@ def handle_ssh_args():
         logging.error("Error: Command args '%s' is invalid! unsafe." % args)
         sys.exit(1)
     path = match.group('path')
+
+    user = current_user()
     
     
 
@@ -76,15 +104,4 @@ def bootstrap():
 #    print 'git-server here@ ok.'
 #    s = os.environ.get('SSH_ORIGINAL_COMMAND', None)
 #    os.system("echo s > ~/a")
-
-def current_user():
-    ssh_id  = parser_command_ssh_id()
-    user_id = db_result(db_query("SELECT uid FROM {sshes} WHERE id=%d", ssh_id))
-    logging.info("user id is %d" % user_id)
-
-
-
-
-
-
 
