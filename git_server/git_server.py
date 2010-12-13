@@ -28,6 +28,7 @@ def parser_command_ssh_id():
     (options, args) = c_handle.parse_args()
     if not len(args):
         logging.error("git-server params error, Is't ssh_id number, it is None")
+        sys.exit(1)
     return int(args.pop(0))
 
 def handle_ssh_args():
@@ -65,7 +66,8 @@ def bootstrap():
 
     # change to git user's home dir
     os.chdir(os.path.expanduser('~'))
-    
+    db_connect()
+    current_user()
     handle_ssh_args()
 
 
@@ -74,4 +76,15 @@ def bootstrap():
 #    print 'git-server here@ ok.'
 #    s = os.environ.get('SSH_ORIGINAL_COMMAND', None)
 #    os.system("echo s > ~/a")
+
+def current_user():
+    ssh_id  = parser_command_ssh_id()
+    user_id = db_result(db_query("SELECT uid FROM {sshes} WHERE id=%d", ssh_id))
+    logging.info("user id is %d" % user_id)
+
+
+
+
+
+
 

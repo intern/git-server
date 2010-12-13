@@ -78,7 +78,7 @@ def read_init_public_key():
 
 def admin_config():
     conf = get_db_config_file()
-    return (conf.get('ADMIN', 'email'), conf.get('ADMIN', 'login'))
+    return (conf.get('ADMIN', 'login'), conf.get('ADMIN', 'email'))
 
 # bootstrap to init tables struct and admin data.
 def bootstrap():

@@ -35,7 +35,7 @@ import re
 # Globle the db link handle and table prefix
 __DB = None
 
-__DB_PREFIX = None
+__DB_PREFIX = ''
 
 # Indicates the place holders that should be replaced in __db_query_callback()
 DB_QUERY_REGEXP = '(%d|%s|%%|%f|%b|%n)'
@@ -133,7 +133,7 @@ def __db_connect( *args, **args_dict ):
     __DB.set_character_set( encoding )
 
 def __db_query(query):
-    print "LOG:: ", query
+    #print "LOG:: ", query
     cursor = __DB.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute(query)
     return cursor
