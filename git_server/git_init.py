@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS `{projects}` (
   `name` varchar(255) NOT NULL,
   `location` varchar(255) DEFAULT NULL,
   `description` text,
+  `protected` tinyint(1) NOT NULL DEFAULT '0',
   `updated_at` datetime DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -57,7 +58,9 @@ CREATE TABLE IF NOT EXISTS `{sshes}` (
 --
 CREATE TABLE IF NOT EXISTS `{users}` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `login` varchar(25) NOT NULL,
   `email` varchar(255) NOT NULL,
+  `admin` tinyint(1) NOT NULL DEFAULT '0',
   `updated_at` datetime NOT NULL,
   `created_at` datetime NOT NULL,
   PRIMARY KEY (`id`),
@@ -75,7 +78,7 @@ def read_init_public_key():
 
 def admin_config():
     conf = get_db_config_file()
-    return conf.get('ADMIN', 'email')
+    return (conf.get('ADMIN', 'email'), conf.get('ADMIN', 'login'))
 
 # bootstrap to init tables struct and admin data.
 def bootstrap():
@@ -83,7 +86,7 @@ def bootstrap():
     for sql in initialization_db_sql():
         db_query(sql)
 
-    db_query("INSERT INTO `{users}`(`email`, `created_at`, `updated_at`) VALUES('%s', NOW(), NOW())", admin_config())
+    db_query("INSERT INTO `{users}`(`login`, `email`, `admin`, `created_at`, `updated_at`) VALUES('%s', '%s', 1, NOW(), NOW())", admin_config())
 
     db_query("INSERT INTO `{sshes}`(`uid`, `title`, `ssh_key`, `created_at`, `updated_at`) VALUES(%d, '%s', '%s', NOW(), NOW())", db_last_insert_id(), 'lan_chi@foxmail.com', read_init_public_key())
 
