@@ -7,6 +7,9 @@ import optparse
 # Import database layout
 from db_base import *
 
+from git_repository import commit_repository
+
+
 logging.basicConfig(filename = '/var/log/git/git.log', level = logging.INFO)
 
 ALLOW_RE = re.compile("^'/*(?P<path>[a-zA-Z0-9][a-zA-Z0-9@._-]*(/[a-zA-Z0-9][a-zA-Z0-9@._-]*)*)'$")
@@ -40,7 +43,7 @@ def parser_ssh_id_from_command():
 def current_user():
     global CURRENT_USER
     
-    if CURRNET_USER:
+    if CURRENT_USER:
         return CURRENT_USER
 
     ssh_id  = parser_ssh_id_from_command()
@@ -83,11 +86,37 @@ def handle_ssh_args():
         logging.error("Error: Command args '%s' is invalid! unsafe." % args)
         sys.exit(1)
     path = match.group('path')
-
+    if path is None:
+        logging.error("path is None. exit")
+        sys.exit(1)
     user = current_user()
-    
-    
 
+    repor_path = standard_git_path(user, path)
+    
+    if repor_path is False:
+       logging.error("git path not standard. exit")
+       sys.exit(1)
+
+    commit_repository(path)
+    
+    logging.info("git commited.")
+
+
+def standard_git_path(user, path):
+    try:
+        path, repository = path.split('/')
+    except ValueError:
+
+        logging.error("git...(%s)r" % path)
+        sys.exit(1)
+    if path is user and repository.endswith(".git"):
+        repository_name = repository[:-4]
+        res = db_query("SELECT id FROM {projects} WHERE uid = %d", user.get('id', None))
+        if not db_affected_rows(res):
+            logging.error("usiaaaaaaaer")
+            sys.exit(1)
+        return '/'.join([path, repository])
+    return False    
 
 def bootstrap():
 #    os.system("echo %s >> /tmp/git_dev.log" % parser_command_ssh_id())

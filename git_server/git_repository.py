@@ -7,4 +7,9 @@
       - copy
       - delete
 """
+import os, sys
 
+from db_base import *
+
+def commit_repository(path):
+    pass
