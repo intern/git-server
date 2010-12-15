@@ -86,6 +86,9 @@ def handle_ssh_args():
         logging.error("Error: Command args '%s' is invalid! unsafe." % args)
         sys.exit(1)
     path = match.group('path')
+
+    logging.info("path=>%s; args=> %s" % (path,args))
+
     if path is None:
         logging.error("path is None. exit")
         sys.exit(1)
@@ -97,25 +100,31 @@ def handle_ssh_args():
        logging.error("git path not standard. exit")
        sys.exit(1)
 
-    commit_repository(path)
+    full_path = commit_repository(path)
+    final_cmd = "%(command)s '%(path)s'" % dict(
+        command=command,
+        path=full_path
+        )
+    logging.info("Commiting....%s" % final_cmd)
+    os.execvp('git', ['git', 'shell', '-c', final_cmd])
     
-    logging.info("git commited.")
+    logging.info("ERROR.")
 
 
 def standard_git_path(user, path):
     try:
-        path, repository = path.split('/')
+        sub_path, repository = path.split('/')
     except ValueError:
-
         logging.error("git...(%s)r" % path)
         sys.exit(1)
-    if path is user and repository.endswith(".git"):
+    logging.error("user: %s: path :%s git: %s" % (user.get("login", "None"), sub_path, str(repository.endswith(".git"))))
+    if sub_path == user.get('login', None) and repository.endswith(".git"):
         repository_name = repository[:-4]
-        res = db_query("SELECT id FROM {projects} WHERE uid = %d", user.get('id', None))
+        res = db_query("SELECT id FROM {projects} WHERE uid = %d AND name='%s'", user.get('id', None), repository_name)
         if not db_affected_rows(res):
-            logging.error("usiaaaaaaaer")
+            logging.error("Project not find.")
             sys.exit(1)
-        return '/'.join([path, repository])
+        return '/'.join([sub_path, repository])
     return False    
 
 def bootstrap():
