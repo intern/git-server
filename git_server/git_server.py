@@ -100,14 +100,14 @@ def handle_ssh_args():
         sys.exit(1)
     # get current user info
     user = current_user()
-
-    repor_path = standard_git_path(user, path)
     
-    if repor_path is False:
+    try:
+        user_path, repository = standard_git_path(user, path)
+    except ValueError:
        logging.error("git path not standard. exit")
        sys.exit(1)
 
-    full_path = commit_repository(path)
+    full_path = git_commit(user_path, repository)
     final_cmd = "%(command)s '%(path)s'" % dict(
         command=command,
         path=full_path
@@ -121,19 +121,19 @@ def handle_ssh_args():
 
 def standard_git_path(user, path):
     try:
-        sub_path, repository = path.split('/')
+        _user, repository = path.split('/')
     except ValueError:
         logging.error("git path error. Can't split with '/'" % path)
         sys.exit(1)
 
-    if sub_path == user.get('login', None) and repository.endswith(".git"):
+    if _user == user.get('login', None) and repository.endswith(".git"):
         repository_name = repository[:-4]
         res = db_query("SELECT id FROM {projects} WHERE uid = %d AND name='%s'", user.get('id', None), repository_name)
         if not db_affected_rows(res):
-            logging.error("Project '%s' not found with user '%s'.", (repository, sub_path))
+            logging.error("Project '%s' not found with user '%s'.", (repository, _user))
             sys.exit(1)
 
-        return '/'.join([sub_path, repository])
+        return [user, repository]
     return False 
 
 def bootstrap():
