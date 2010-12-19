@@ -61,8 +61,7 @@ def __action_boot():
     )
     options, args = parser.parse_args()
     if options.action is None:
-        return EXIT.API_NO_ACTION
+        sys.exit(EXIT.API_NO_ACTION)
     API_callback = "git_API_%s" % options.action
     if API_callback in GIT_WEB_APIs:
         globals()[API_callback](*args)        
-    return 0

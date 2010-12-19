@@ -7,7 +7,7 @@ import optparse
 # Import database layout
 from db_base import *
 
-from git_repository import commit_repository
+from git_repository import git_commit
 
 
 logging.basicConfig(filename = '/var/log/git/git.log', level = logging.INFO)
@@ -67,8 +67,6 @@ def handle_ssh_args():
         logging.error("Must access this with ssh, because SSH_ORIGINAL_COMMAND is None!")
         sys.exit(1)
 
-    logging.info("Runing command: %(cmd)r", dict(cmd = cmd))
-
     if '\n' in cmd:
         logging.error("Command may not contain newline. :'%s'" % cmd)
         sys.exit(1)
@@ -89,6 +87,7 @@ def handle_ssh_args():
         sys.exit(1)
 
     match = ALLOW_RE.match(args)
+
     if match is None:
         logging.error("Command args '%s' is invalid! unsafe." % args)
         sys.exit(1)
@@ -100,7 +99,7 @@ def handle_ssh_args():
         sys.exit(1)
     # get current user info
     user = current_user()
-    
+
     try:
         user_path, repository = standard_git_path(user, path)
     except ValueError:
@@ -108,10 +107,12 @@ def handle_ssh_args():
        sys.exit(1)
 
     full_path = git_commit(user_path, repository)
+
     final_cmd = "%(command)s '%(path)s'" % dict(
         command=command,
         path=full_path
         )
+
     logging.debug("Commiting....%s" % final_cmd)
 
     os.execvp('git', ['git', 'shell', '-c', final_cmd])
@@ -125,15 +126,13 @@ def standard_git_path(user, path):
     except ValueError:
         logging.error("git path error. Can't split with '/'" % path)
         sys.exit(1)
-
     if _user == user.get('login', None) and repository.endswith(".git"):
         repository_name = repository[:-4]
         res = db_query("SELECT id FROM {projects} WHERE uid = %d AND name='%s'", user.get('id', None), repository_name)
         if not db_affected_rows(res):
-            logging.error("Project '%s' not found with user '%s'.", (repository, _user))
+            logging.error("Project '%s' not found with user '%s'." % (repository, _user))
             sys.exit(1)
-
-        return [user, repository]
+        return (_user, repository)
     return False 
 
 def bootstrap():

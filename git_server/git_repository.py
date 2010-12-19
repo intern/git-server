@@ -16,6 +16,8 @@ from db_base import *
 # git repository root.
 GIT_ROOT = os.path.join(os.path.expanduser("~"), "repositories")
 
+# all git project end of .git
+
 # git commit hook, used with `git-server`
 def git_commit(user, repository):
     full_path = os.path.join(GIT_ROOT, user, repository)
