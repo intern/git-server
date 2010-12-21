@@ -49,7 +49,7 @@ def current_user():
 
     ssh_id  = parser_ssh_id_from_command()
 
-    results = db_query("SELECT user.* FROM master_users AS user LEFT JOIN master_sshes AS ssh ON ssh.uid = user.id WHERE ssh.id = %d limit 1", ssh_id)
+    results = db_query("SELECT user.* FROM master_users AS user LEFT JOIN master_sshes AS ssh ON ssh.user_id = user.id WHERE ssh.id = %d limit 1", ssh_id)
 
     user = db_fetch_hash(results)
 
@@ -128,7 +128,7 @@ def standard_git_path(user, path):
         sys.exit(1)
     if _user == user.get('login', None) and repository.endswith(".git"):
         repository_name = repository[:-4]
-        res = db_query("SELECT id FROM {projects} WHERE uid = %d AND name='%s'", user.get('id', None), repository_name)
+        res = db_query("SELECT id FROM {projects} WHERE user_id = %d AND name='%s'", user.get('id', None), repository_name)
         if not db_affected_rows(res):
             logging.error("Project '%s' not found with user '%s'." % (repository, _user))
             sys.exit(1)

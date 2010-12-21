@@ -27,7 +27,7 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 --
 CREATE TABLE IF NOT EXISTS `{projects}` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `uid` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `location` varchar(255) DEFAULT NULL,
   `description` text,
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS `{projects}` (
 
 CREATE TABLE IF NOT EXISTS `{sshes}` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `uid` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
   `title` varchar(255) NOT NULL,
   `ssh_key` text NOT NULL,
   `updated_at` datetime DEFAULT NULL,
@@ -88,7 +88,7 @@ def bootstrap():
 
     db_query("INSERT INTO `{users}`(`login`, `email`, `admin`, `created_at`, `updated_at`) VALUES('%s', '%s', 1, NOW(), NOW())", admin_config())
 
-    db_query("INSERT INTO `{sshes}`(`uid`, `title`, `ssh_key`, `created_at`, `updated_at`) VALUES(%d, '%s', '%s', NOW(), NOW())", db_last_insert_id(), 'lan_chi@foxmail.com', read_init_public_key())
+    db_query("INSERT INTO `{sshes}`(`user_id`, `title`, `ssh_key`, `created_at`, `updated_at`) VALUES(%d, '%s', '%s', NOW(), NOW())", db_last_insert_id(), 'lan_chi@foxmail.com', read_init_public_key())
 
     # commit transaction
     db_commit()
