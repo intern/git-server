@@ -63,6 +63,9 @@ def current_user():
 
 def handle_ssh_args():
     cmd = os.environ.get('SSH_ORIGINAL_COMMAND', None)
+
+    #logging.error("%s===============" % cmd)
+
     if cmd is None:
         logging.error("Must access this with ssh, because SSH_ORIGINAL_COMMAND is None!")
         sys.exit(1)

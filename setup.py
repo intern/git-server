@@ -2,9 +2,14 @@
 """
   git-server setuptools
 """
-import os, sys
+import os, sys, ConfigParser
 
 from setuptools import setup,find_packages
+
+def get_server_settings():
+    config = ConfigParser.ConfigParser()
+    # TODO fix the abs path
+    config.read('/etc/git.conf')
 
 # mkdir git logging dir and copy the git server config. et: db conf.
 def install_config():
