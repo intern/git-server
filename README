@@ -1,8 +1,29 @@
-The git-server can manage the git projects own use mysql database, It‘s easy.
+The git-server can manage the git projects own use mysql database, It's easy.
   - use the mysql db can mange user SSH key.
   - Embedded into the web application.
 
 =SETUP=
 =======
-  Coming soon...
-
+  #  install pythonsetuptools
+  $sudo apt-get install python-setuptools
+  
+  # download this git server version and execute
+  $sudo python setup.py install
+  
+  # add git user
+  $sudo adduser \
+  $>–system \
+  $>–shell /bin/sh \
+  $>–gecos ‘git version control’ \
+  $>–group \
+  $>–disabled-password \
+  $>–home /var/git \
+  $>git
+  
+  # setting the git databse info
+  $ vi /etc/git.conf
+  
+  # init the server
+  $sudo -H -u git git-init < ~/.ssh/ids.pub
+  
+  # add database user data...
